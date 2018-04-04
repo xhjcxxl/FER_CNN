@@ -13,7 +13,7 @@ def format_image(image):
     image = cv2.imdecode(image, cv2.CV_LOAD_IMAGE_GRAYSCALE)
   gray_border = np.zeros((150, 150), np.uint8)
   gray_border[:,:] = 200
-  gray_border[((150 / 2) - (SIZE_FACE/2)):((150/2)+(SIZE_FACE/2)), ((150/2)-(SIZE_FACE/2)):((150/2)+(SIZE_FACE/2))] = image
+  gray_border[((150 // 2) - (SIZE_FACE//2)):((150//2)+(SIZE_FACE//2)), ((150//2)-(SIZE_FACE//2)):((150//2)+(SIZE_FACE//2))] = image
   image = gray_border
 
   faces = cascade_classifier.detectMultiScale(
@@ -64,14 +64,25 @@ data = pd.read_csv(FILE_PATH)
 
 labels = []
 images = []
+labels_test = []
+images_test = []
 index = 1
+index_set = 1
+index_test = 1
 total = data.shape[0]
 for index, row in data.iterrows():
     emotion = emotion_to_vec(row['emotion'])
     image = data_to_image(row['pixels'])
+    Usage = row['Usage']
     if image is not None:
-        labels.append(emotion)
-        images.append(image)
+        if Usage == "Training":
+            labels.append(emotion)
+            images.append(image)
+            index_set += 1
+        elif Usage == "PublicTest":
+            labels_test.append(emotion)
+            images_test.append(image)
+            index_test += 1
         #labels.append(emotion)
         #images.append(flip_image(image))
     else:
@@ -82,3 +93,7 @@ for index, row in data.iterrows():
 print "Total: " + str(len(images))
 np.save('data_kike.npy', images)
 np.save('labels_kike.npy', labels)
+np.save('data_set_fer2013.npy', images)
+np.save('data_labels_fer2013.npy', labels)
+np.save('test_set_fer2013.npy', images_test)
+np.save('test_labels_fer2013.npy', labels_test)
